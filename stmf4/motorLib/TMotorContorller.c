@@ -1,7 +1,7 @@
 #include "motorLib/TMotorContorller.h"
 #include "motorLib/MotorController.h"
 #include "myLib/cUart.h"
-#include "cCommandGetter.h"
+#include "myLib/cCommandGetter.h"
 
 MotorController myMotor;
 MotorController* ptrMotor;
@@ -13,7 +13,7 @@ void TestMotorControllerConfig() {
 void DisplayMotor() {
 	static unsigned int lastTime = 0;
 	unsigned int currentTime = GetSystemTimer();
-	unsigned int deltaTime = abs(currentTime - lastTime);
+	unsigned int deltaTime = currentTime - lastTime;
 	if (deltaTime > 1000000) {
 		UartPrint("motor:%d, %.1f\r\n",
 				ptrMotor->motorEncoder->accumEncoderCounts,
@@ -40,7 +40,7 @@ void TestMCConsistentBtwnMotorPortNEncoder() {
 	}
 
 	SetModeMotor(ptrMotor, OPENED_LOOP_VELOCITY); //openloop
-	SetTargetMotorSpeed(ptrMotor, (float) velocity);
+	SetTargetMotorVelocity(ptrMotor, (float) velocity);
 	UpdateMotorControlLoop(ptrMotor);
 	UpdateMotorEncoderNSpeed(ptrMotor);
 	DisplayMotor();
@@ -65,7 +65,7 @@ void TestMCVeloFBControl() {
 	}
 
 	SetModeMotor(ptrMotor, CLOSED_LOOP_VELOCITY); //openloop
-	SetTargetMotorSpeed(ptrMotor, velocity);
+	SetTargetMotorVelocity(ptrMotor, velocity);
 	UpdateMotorControlLoop(ptrMotor);
 	UpdateMotorEncoderNSpeed(ptrMotor);
 	DisplayMotor();
@@ -119,7 +119,7 @@ void TestMCMixFBControl() {
 		case 's':
 			velocity = atoi(&cmdString[1]);
 			SetModeMotor(ptrMotor, CLOSED_LOOP_VELOCITY); //openloop
-			SetTargetMotorSpeed(ptrMotor, velocity);
+			SetTargetMotorVelocity(ptrMotor, velocity);
 			ptrMotor->motorData->motorAccelerationLimit = 5;
 			ptrMotor->motorVelocityPID->pGain = 0.8;
 			position = 0;

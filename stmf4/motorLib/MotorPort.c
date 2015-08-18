@@ -8,8 +8,8 @@ void MotorPortStructInit(MotorPort * me) {
 	me->isEnable = DISABLE;
 	i = 1;
 	do {
-		me->motorDirectionPin[i] = 0;
-		me->motorDirectionPort[i] = 0;
+		me->motorControlPin[i] = 0;
+		me->motorControlPort[i] = 0;
 	} while (i-- != 0);
 
 	me->motorTIM = 0;
@@ -207,20 +207,20 @@ inline void MotorPort0ConfigInterface0(MotorPort * me) {
 	PB0nPB1DirectionConfig0();
 	me->motorDAC = (uint32_t*) (DAC_BASE + DHR12R2_OFFSET + DAC_Align_12b_R);
 	me->motorTIM = 0;
-	me->motorDirectionPort[0] = GPIOB;
-	me->motorDirectionPin[0] = GPIO_Pin_0;
-	me->motorDirectionPort[1] = GPIOB;
-	me->motorDirectionPin[1] = GPIO_Pin_1;
+	me->motorControlPort[0] = GPIOB;
+	me->motorControlPin[0] = GPIO_Pin_0;
+	me->motorControlPort[1] = GPIOB;
+	me->motorControlPin[1] = GPIO_Pin_1;
 	SetRotate(me, 0);
 }
 inline void MotorPort0ConfigInterface1(MotorPort * me) {
 	Tim8Config1();
 	PC0nPC1DirectionConfig1();
 	me->motorTIM = &(TIM8->CCR1);
-	me->motorDirectionPort[0] = GPIOC;
-	me->motorDirectionPin[0] = GPIO_Pin_0;
-	me->motorDirectionPort[1] = GPIOC;
-	me->motorDirectionPin[1] = GPIO_Pin_1;
+	me->motorControlPort[0] = GPIOC;
+	me->motorControlPin[0] = GPIO_Pin_0;
+	me->motorControlPort[1] = GPIOC;
+	me->motorControlPin[1] = GPIO_Pin_1;
 	SetRotate(me, 0);
 }
 inline void MotorPort0ConfigInterface11(MotorPort * me) {
@@ -228,10 +228,10 @@ inline void MotorPort0ConfigInterface11(MotorPort * me) {
 	PC0nPC1DirectionConfig1();
 	me->motorDAC = 0;
 	me->motorTIM = &(TIM1->CCR1);
-	me->motorDirectionPort[1] = GPIOE;
-	me->motorDirectionPin[1] = GPIO_Pin_2;
-	me->motorDirectionPort[0] = GPIOE;
-	me->motorDirectionPin[0] = GPIO_Pin_3;
+	me->motorControlPort[1] = GPIOE;
+	me->motorControlPin[1] = GPIO_Pin_2;
+	me->motorControlPort[0] = GPIOE;
+	me->motorControlPin[0] = GPIO_Pin_3;
 	SetRotate(me, 0);
 }
 inline void MotorPort0ConfigInterface2(MotorPort * me) {
@@ -239,21 +239,24 @@ inline void MotorPort0ConfigInterface2(MotorPort * me) {
 	PE6nPC13DirectionConfig2();
 	me->motorDAC = (uint32_t*) (DAC_BASE + DHR12R1_OFFSET + DAC_Align_12b_R);
 	me->motorTIM = 0;
-	me->motorDirectionPort[0] = GPIOE;
-	me->motorDirectionPin[0] = GPIO_Pin_6;
-	me->motorDirectionPort[1] = GPIOC;
-	me->motorDirectionPin[1] = GPIO_Pin_13;
+	me->motorControlPort[0] = GPIOE;
+	me->motorControlPin[0] = GPIO_Pin_6;
+	me->motorControlPort[1] = GPIOC;
+	me->motorControlPin[1] = GPIO_Pin_13;
 	SetRotate(me, 0);
 }
 
 void MotorPort0Config(MotorPort * me) {
 	MotorPort0ConfigInterface0(me);
+	me->id = 0;
 }
 void MotorPort1Config(MotorPort * me) {
 	MotorPort0ConfigInterface1(me);
+	me->id = 1;
 }
 void MotorPort2Config(MotorPort * me) {
 	MotorPort0ConfigInterface2(me);
+	me->id = 2;
 }
 
 void MotorPortConfigForMAT(MotorPort * me) {
@@ -261,10 +264,10 @@ void MotorPortConfigForMAT(MotorPort * me) {
 	PC0nPC1DirectionConfig1();
 	me->motorDAC = (uint32_t*) (DAC_BASE + DHR12R1_OFFSET + DAC_Align_12b_R);
 	me->motorTIM = 0;
-	me->motorDirectionPort[0] = GPIOC;
-	me->motorDirectionPin[0] = GPIO_Pin_0;
-	me->motorDirectionPort[1] = GPIOC;
-	me->motorDirectionPin[1] = GPIO_Pin_1;
+	me->motorControlPort[0] = GPIOC;
+	me->motorControlPin[0] = GPIO_Pin_0;
+	me->motorControlPort[1] = GPIOC;
+	me->motorControlPin[1] = GPIO_Pin_1;
 	SetRotate(me, 0);
 }
 
@@ -286,20 +289,20 @@ inline void DisableMotorInterface0(MotorPort * me) {
 inline void SetRotateDACInterface0(MotorPort * me, int setSpeed) {
 	setSpeed = 4 * setSpeed;
 	if (setSpeed > 0) {
-		GPIO_WriteBit(me->motorDirectionPort[0], me->motorDirectionPin[0], SET);
-		GPIO_WriteBit(me->motorDirectionPort[1], me->motorDirectionPin[1],
+		GPIO_WriteBit(me->motorControlPort[0], me->motorControlPin[0], SET);
+		GPIO_WriteBit(me->motorControlPort[1], me->motorControlPin[1],
 				!SET);
 		*me->motorDAC = (uint16_t)(setSpeed);
 	} else if (setSpeed == 0) {
-		GPIO_WriteBit(me->motorDirectionPort[0], me->motorDirectionPin[0],
+		GPIO_WriteBit(me->motorControlPort[0], me->motorControlPin[0],
 				!SET);
-		GPIO_WriteBit(me->motorDirectionPort[1], me->motorDirectionPin[1],
+		GPIO_WriteBit(me->motorControlPort[1], me->motorControlPin[1],
 				!SET);
 		*me->motorDAC = (uint16_t) 0;
 	} else {
-		GPIO_WriteBit(me->motorDirectionPort[0], me->motorDirectionPin[0],
+		GPIO_WriteBit(me->motorControlPort[0], me->motorControlPin[0],
 				!SET);
-		GPIO_WriteBit(me->motorDirectionPort[1], me->motorDirectionPin[1], SET);
+		GPIO_WriteBit(me->motorControlPort[1], me->motorControlPin[1], SET);
 		*me->motorDAC = (uint16_t)(-setSpeed);
 	}
 }
@@ -308,21 +311,21 @@ inline void SetRotateDAC(MotorPort * me, int setSpeed) {
 }
 inline void SetRotatePWM(MotorPort * me, int setSpeed) {
 	if (setSpeed > 0) {
-		GPIO_WriteBit(me->motorDirectionPort[0], me->motorDirectionPin[0], SET);
-		GPIO_WriteBit(me->motorDirectionPort[1], me->motorDirectionPin[1],
+		GPIO_WriteBit(me->motorControlPort[0], me->motorControlPin[0], SET);
+		GPIO_WriteBit(me->motorControlPort[1], me->motorControlPin[1],
 				!SET);
 		*me->motorTIM = (uint32_t) setSpeed;
 	} else if (setSpeed == 0) {
-		GPIO_WriteBit(me->motorDirectionPort[0], me->motorDirectionPin[0],
+		GPIO_WriteBit(me->motorControlPort[0], me->motorControlPin[0],
 				!SET);
-		GPIO_WriteBit(me->motorDirectionPort[1], me->motorDirectionPin[1],
+		GPIO_WriteBit(me->motorControlPort[1], me->motorControlPin[1],
 				!SET);
 		*me->motorTIM = (uint32_t) 0;
 	} else {
-		GPIO_WriteBit(me->motorDirectionPort[0], me->motorDirectionPin[0],
+		GPIO_WriteBit(me->motorControlPort[0], me->motorControlPin[0],
 				!SET);
-		GPIO_WriteBit(me->motorDirectionPort[1], me->motorDirectionPin[1], SET);
-		*me->motorTIM = (uint32_t) (-setSpeed);
+		GPIO_WriteBit(me->motorControlPort[1], me->motorControlPin[1], SET);
+		*me->motorTIM = (uint32_t)(-setSpeed);
 	}
 }
 
@@ -335,28 +338,11 @@ inline void SetSoftStopInterface1(MotorPort * me) {
 	SetRotate(me, 0);
 }
 
-void SetStop(MotorPort * me) {
-
-}
-
-int IsMotorEnable(MotorPort * me) {
-	return me->isEnable;
-}
-void EnableMotor(MotorPort * me) {
-	EnableMotorInterface0(me);
-}
-void DisableMotor(MotorPort * me) {
-	SetSoftStop(me);
-	DisableMotorInterface0(me);
-}
-//get any Value from -1000 to 1000
-void SetRotate(MotorPort * me, int iValue) {
-	if (me->motorTIM != 0) {
-		SetRotatePWM(me, iValue);
-	} else if (me->motorDAC != 0) {
-		SetRotateDAC(me, iValue);
-	}
-}
-void SetSoftStop(MotorPort * me) {
-	SetSoftStopInterface0(me);
-}
+////get any Value from -1000 to 1000
+//void SetRotate(MotorPort * me, int iValue) {
+//	if (me->motorTIM != 0) {
+//		SetRotatePWM(me, iValue);
+//	} else if (me->motorDAC != 0) {
+//		SetRotateDAC(me, iValue);
+//	}
+//}

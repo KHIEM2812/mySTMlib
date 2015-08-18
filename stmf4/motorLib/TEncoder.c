@@ -1,6 +1,6 @@
 #include "TEncoder.h"
 
-encoder_t encoder0, encoder1;
+Encoder encoder0, encoder1;
 MotorPort tMotorPors;
 
 void TEncoderConfig() {
@@ -13,7 +13,7 @@ void TEncoderConfig() {
 void DisplayEnc0Counts() {
 	static unsigned int lastTime = 0;
 	unsigned int currentTime = GetSystemTimer();
-	unsigned int deltaTime = abs(currentTime - lastTime);
+	unsigned int deltaTime = currentTime - lastTime;
 	if (deltaTime > 1000000) {
 		UartPrint("enc0:%d, %d\r\n", (int) encoder0.accumEncoderCounts,
 				(int) encoder0.deltaEncoderCount);
@@ -25,7 +25,7 @@ void DisplayEnc0Counts() {
 void DisplayEnc1Counts() {
 	static unsigned int lastTime = 0;
 	unsigned int currentTime = GetSystemTimer();
-	unsigned int deltaTime = abs(currentTime - lastTime);
+	unsigned int deltaTime = currentTime - lastTime;
 	if (deltaTime > 1000000) {
 		UartPrint("enc1:%d, %d\r\n", (int) encoder1.accumEncoderCounts,
 				(int) encoder1.deltaEncoderCount);

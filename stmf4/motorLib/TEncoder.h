@@ -18,7 +18,7 @@
 #include "encoder.h"
 #include "MotorPort.h"
 #include "utility.h"
-
+#include "../cAlienCatherPeripheral.h"
 
 void TEncoderConfig();
 void DisplayEnc0Counts();

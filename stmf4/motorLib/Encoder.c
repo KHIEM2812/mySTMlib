@@ -1,6 +1,6 @@
 #include "encoder.h"
 
-void EncStructInit(encoder_t* me) {
+void EncStructInit(Encoder* me) {
 	me->isEnable = 0;
 	me->prevEncoderCount = 0;
 	me->currEncoderCount = 0;
@@ -11,7 +11,7 @@ void EncStructInit(encoder_t* me) {
 }
 
 //use tim1,cc1
-void Enc3Config(encoder_t* me) {
+void Enc3Config(Encoder* me) {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
@@ -33,10 +33,10 @@ void Enc3Config(encoder_t* me) {
 	TIM_SetAutoreload(TIM3, 0xffff);
 	TIM_SetCounter(TIM3, 0);
 	me->encoderTIM = TIM3;
-	me->encoderAddr = (u32) &TIM3->CNT;
-	EnableEncoder(me);
+	me->encoderAddr = (unsigned int) &TIM3->CNT;
+	EnableEncoder(me); //	TIM_Cmd(TIM3, ENABLE);
 }
-void Enc0Config(encoder_t* me) {
+void Enc0Config(Encoder* me) {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
@@ -53,16 +53,18 @@ void Enc0Config(encoder_t* me) {
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_TIM3);
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_TIM3);
 
-	TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI1,
-			TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+	TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI1, TIM_ICPolarity_Rising,
+			TIM_ICPolarity_Rising);
 	TIM_SetAutoreload(TIM3, 0xffff);
 	TIM_Cmd(TIM3, ENABLE);
+	TIM_SetCounter(TIM3, 0);
+	//	TIM_Cmd(TIM3, ENABLE);
 	me->encoderTIM = TIM3;
-	me->encoderAddr = (u32) &TIM3->CNT;
-	EnableEncoder(me);
+	me->encoderAddr = (unsigned int) &TIM3->CNT;
+	EnableEncoder(me); //	TIM_Cmd(TIM3, ENABLE);
 }
 //use tim8,cc1
-void Enc1Config(encoder_t* me) {
+void Enc1Config(Encoder* me) {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
@@ -83,27 +85,27 @@ void Enc1Config(encoder_t* me) {
 			TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
 	TIM_SetAutoreload(TIM4, 0xffff);
 	TIM_SetCounter(TIM4, 0);
+	//	TIM_Cmd(TIM4, ENABLE);
 	me->encoderTIM = TIM4;
-	me->encoderAddr = (u32) &TIM4->CNT;
-	EnableEncoder(me);
+	me->encoderAddr = (unsigned int) &TIM4->CNT;
+	EnableEncoder(me); //	TIM_Cmd(TIM4, ENABLE);
 }
 
-void DisableEncoder(encoder_t * me) {
+void DisableEncoder(Encoder * me) {
 	TIM_Cmd(me->encoderTIM, DISABLE);
 	me->isEnable = 0;
 }
-
-void EnableEncoder(encoder_t * me) {
+void EnableEncoder(Encoder * me) {
 	TIM_Cmd(me->encoderTIM, ENABLE);
 	me->isEnable = 1;
 }
 
-int IsEncoderEnable(encoder_t * me) {
+int IsEncoderEnable(Encoder * me) {
 	return me->isEnable;
 }
 
 //to avoid overflow
-void SetEncoder(encoder_t * me, s32 encoderCounter) {
+void SetEncoder(Encoder * me, int encoderCounter) {
 	DisableEncoder(me);
 	me->accumEncoderCounts = encoderCounter;
 	me->currEncoderCount = 0;
@@ -112,18 +114,7 @@ void SetEncoder(encoder_t * me, s32 encoderCounter) {
 	TIM_SetCounter(me->encoderTIM, 0);
 	EnableEncoder(me);
 }
-
-//Port, need to be called frequently
-//ret:encoderCounter
-s32 GetEncoderCounts(encoder_t * me) {
-	me->currEncoderCount = (s16) (*((u16*) me->encoderAddr));
-	me->deltaEncoderCount = me->currEncoderCount - me->prevEncoderCount;
-	me->prevEncoderCount = me->currEncoderCount;
-	me->accumEncoderCounts += (s32) me->deltaEncoderCount;
-	return me->accumEncoderCounts;
-}
-
-void ResetEncoder(encoder_t * me) {
+void ResetEncoder(Encoder * me) {
 	DisableEncoder(me);
 	me->prevEncoderCount = 0;
 	me->currEncoderCount = 0;
@@ -132,5 +123,15 @@ void ResetEncoder(encoder_t * me) {
 	TIM_SetCounter(me->encoderTIM, 0);
 	GetEncoderCounts(me);
 	EnableEncoder(me);
+}
+
+//Port, need to be called frequently
+//ret:encoderCounter
+int GetEncoderCounts(Encoder * me) {
+	me->currEncoderCount = (s16) (*((u16*) me->encoderAddr));
+	me->deltaEncoderCount = me->currEncoderCount - me->prevEncoderCount;
+	me->prevEncoderCount = me->currEncoderCount;
+	me->accumEncoderCounts += (s32) me->deltaEncoderCount;
+	return me->accumEncoderCounts;
 }
 

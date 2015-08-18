@@ -16,10 +16,10 @@
 
 #include "STM32F4-Discovery/stm32f4_discovery.h"
 #include <string.h>
-#include "../stmf4/systemTimer.h"
+#include "myLib/systemTimer.h"
 
 #define CHECK_MSEC			100
-#define DEBOUNCE_TIME       0.3
+#define DEBOUNCE_TIME       0.7
 #define SAMPLE_FREQUENCY    10
 #define MAXIMUM         	(DEBOUNCE_TIME*1000 / CHECK_MSEC)
 

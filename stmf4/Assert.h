@@ -14,11 +14,7 @@
 #include "myLib/cUart.h"
 #include <stdio.h>
 #include <stdarg.h>
-
-
-#define DEBUGON
-#define DEBUGLV		LOG_TEST
-#define ASSERTLV	2
+#include "deviceConfig.h"
 
 //typedef enum {
 //	LOG_DEFAULT, LOG_INFO, LOG_ERROR, LOG_DEBUG

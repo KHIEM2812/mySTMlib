@@ -17,25 +17,25 @@ typedef struct {
 	s16 prevEncoderCount;
 	s16 currEncoderCount;
 	s16 deltaEncoderCount;
-	s32 accumEncoderCounts;
-	u32 encoderAddr;
+	int accumEncoderCounts;
+	unsigned int encoderAddr;
 	TIM_TypeDef * encoderTIM;
-} encoder_t;
+} Encoder;
 
-void Enc0Config(encoder_t* me);
-void Enc1Config(encoder_t* me);
+void Enc0Config(Encoder* me);
+void Enc1Config(Encoder* me);
 
-void EncStructInit(encoder_t* me);
+void EncStructInit(Encoder* me);
 
-void DisableEncoder(encoder_t * me);
-void EnableEncoder(encoder_t * me);
-int IsEncoderEnable(encoder_t * me);
+void DisableEncoder(Encoder * me);
+void EnableEncoder(Encoder * me);
+int IsEncoderEnable(Encoder * me);
 
 //it s not a good practice cuz not follow inverse control principle
-void UpdateEncoder(encoder_t * me);
+void UpdateEncoder(Encoder * me);
 
-void SetEncoder(encoder_t * me, s32 encoderCounter);
-s32 GetEncoderCounts(encoder_t * me);
-void ResetEncoder(encoder_t * me);
+void SetEncoder(Encoder * me, int encoderCounter);
+int GetEncoderCounts(Encoder * me);
+void ResetEncoder(Encoder * me);
 
 #endif

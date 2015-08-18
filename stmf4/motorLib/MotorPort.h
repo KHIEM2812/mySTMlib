@@ -13,10 +13,9 @@
 
 typedef struct {
 	int isEnable;
-	uint16_t motorDirectionPin[2];
-	u32 speedAddr;
-	u32 speedAddr2;
-	GPIO_TypeDef *motorDirectionPort[2]; //0==index for forward, 1==index for reverse
+	int id;
+	uint16_t motorControlPin[2];
+	GPIO_TypeDef *motorControlPort[2]; //0==index for forward, 1==index for reverse
 	volatile uint32_t * motorTIM;
 	volatile uint32_t * motorDAC;
 } MotorPort;
